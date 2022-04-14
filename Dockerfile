@@ -30,9 +30,9 @@ RUN \
 # 时区
 ENV TZ=Asia/Shanghai
 
-#RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
-#  && echo Asia/Shanghai > /etc/timdezone \
-#  && dpkg-reconfigure -f noninteractive tzdata
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+  && echo Asia/Shanghai > /etc/timdezone \
+  && dpkg-reconfigure -f noninteractive tzdata
 
 EXPOSE 8080
 ENTRYPOINT ["/sbin/tini", "--"]
