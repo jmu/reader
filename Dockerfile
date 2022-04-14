@@ -35,7 +35,8 @@ RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
   && dpkg-reconfigure -f noninteractive tzdata
 
 EXPOSE 8080
-ENTRYPOINT ["/sbin/tini", "--"]
+#ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 # COPY --from=hengyunabc/arthas:latest /opt/arthas /opt/arthas
 COPY --from=build-env /app/build/libs/app-1.9.0.jar /app/bin/reader.jar
 CMD ["java", "-jar", "/app/bin/reader.jar" ]
