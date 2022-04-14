@@ -20,8 +20,9 @@ RUN \
     # apk update; \
     # apk upgrade; \
     # Add CA certs tini tzdata
-    sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
-&& apk add --no-cache ca-certificates tini tzdata; \
+    #sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+    #apk add --no-cache ca-certificates tini tzdata; \
+    apt-get update && apt install -y ca-certificates tini tzdata; \
     update-ca-certificates; \
     # Clean APK cache
     rm -rf /var/cache/apk/*;
