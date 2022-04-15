@@ -16,6 +16,7 @@
       @touchstart="handleTouchStart"
       @touchmove="handleTouchMove"
       @touchend="handleTouchEnd"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="navigation-inner-wrapper">
         <div class="navigation-title">
@@ -446,21 +447,29 @@
       <div class="shelf-title">
         <i
           class="el-icon-menu"
-          v-if="collapseMenu"
+          v-if="$store.getters.isNormalPage && collapseMenu"
           @click.stop="toggleMenu"
         ></i>
         {{ isSearchResult ? (isExploreResult ? "探索" : "搜索") : "书架" }}
         ({{ bookList.length }})
-        <div class="title-btn" v-if="isSearchResult" @click="backToShelf">
+        <div
+          class="title-btn"
+          v-if="$store.getters.isNormalPage && isSearchResult"
+          @click="backToShelf"
+        >
           书架
         </div>
-        <div class="title-btn" v-if="isSearchResult" @click="loadMore">
+        <div
+          class="title-btn"
+          v-if="$store.getters.isNormalPage && isSearchResult"
+          @click="loadMore"
+        >
           <i class="el-icon-loading" v-if="loadingMore"></i>
           {{ loadingMore ? "加载中..." : "加载更多" }}
         </div>
         <div
           class="title-btn"
-          v-if="!isSearchResult"
+          v-if="$store.getters.isNormalPage && !isSearchResult"
           @click="showBookEditButton = !showBookEditButton"
         >
           {{ showBookEditButton ? "取消" : "编辑" }}
@@ -469,13 +478,19 @@
           <i class="el-icon-loading" v-if="refreshLoading"></i>
           {{ refreshLoading ? "刷新中..." : "刷新" }}
         </div>
-        <div class="title-btn" v-if="!isSearchResult" @click="showRssDialog">
+        <div
+          class="title-btn"
+          v-if="$store.getters.isNormalPage && !isSearchResult"
+          @click="showRssDialog"
+        >
           RSS
         </div>
         <div
           class="title-btn"
           @click="showExplorePop"
-          v-if="!(isSearchResult && !isExploreResult)"
+          v-if="
+            $store.getters.isNormalPage && !(isSearchResult && !isExploreResult)
+          "
         >
           书海
         </div>
@@ -497,7 +512,7 @@
           :effect="$store.getters.isNight ? 'dark' : 'light'"
           class="book-group-btn"
           :key="'bookGroup-manage'"
-          v-if="bookGroupDisplayList.length"
+          v-if="$store.getters.isNormalPage && bookGroupDisplayList.length"
           @click="showManageBookGroup"
         >
           管理
@@ -607,6 +622,7 @@
       :top="this.collapseMenu ? '0' : '15vh'"
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg' : ''"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="source-container source-list-container">
         <el-checkbox-group
@@ -618,12 +634,9 @@
             :label="index"
             :key="index"
             class="source-checkbox"
-            >{{
-              isImportRssSource ? source.sourceName : source.bookSourceName
-            }}
-            {{
-              isImportRssSource ? source.sourceUrl : source.bookSourceUrl
-            }}</el-checkbox
+            >{{ isImportRssSource ? source.sourceName : source.bookSourceName }}
+            {{ isImportRssSource ? source.sourceUrl : source.bookSourceUrl }}
+            {{ getSourceTag(source) }}</el-checkbox
           >
         </el-checkbox-group>
       </div>
@@ -638,7 +651,12 @@
           >全选</el-checkbox
         >
         <span class="check-tip">已选择 {{ checkedSourceIndex.length }} 个</span>
-        <el-button size="medium" @click="showImportSourceDialog = false"
+        <el-button
+          size="medium"
+          @click="
+            showImportSourceDialog = false;
+            checkedSourceIndex = [];
+          "
           >取消</el-button
         >
         <el-button size="medium" type="primary" @click="saveSourceList"
@@ -656,6 +674,7 @@
       "
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="custom-dialog-title" slot="title">
         <span class="el-dialog__title"
@@ -809,6 +828,7 @@
       :top="dialogTop"
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="source-container table-container">
         <el-table
@@ -885,6 +905,7 @@
       :top="dialogTop"
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="source-container table-container">
         <el-table
@@ -971,6 +992,7 @@
       @closed="importBookDialogClosed"
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="source-container table-container">
         <div class="check-form">
@@ -1030,6 +1052,7 @@
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
       @opened="$refs.bookGroupTableRef.doLayout()"
       @closed="isShowBookGroupSettingDialog = false"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="source-container table-container">
         <el-table
@@ -1172,6 +1195,7 @@
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
       @closed="showRssSourceEditButton = false"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="custom-dialog-title" slot="title">
         <span class="el-dialog__title"
@@ -1230,6 +1254,7 @@
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
       @closed="rssArticleList = []"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="rss-article-list-container" ref="rssArticleListRef">
         <div
@@ -1272,6 +1297,7 @@
       :fullscreen="collapseMenu"
       :class="isWebApp && !isNight ? 'status-bar-light-bg-dialog' : ''"
       @closed="rssArticleInfo = {}"
+      v-if="$store.getters.isNormalPage"
     >
       <div class="rss-article-info-container">
         <div
@@ -1463,7 +1489,7 @@ export default {
   },
   activated() {
     document.title = "阅读";
-    this.scanLocalStorage();
+    this.scanCacheStorage();
   },
   methods: {
     init(refresh) {
@@ -1639,14 +1665,6 @@ export default {
         this.$message.error("后端未连接");
         return;
       }
-      if (page) {
-        this.searchPage = page;
-      }
-      page = this.searchPage;
-      if (page === 1) {
-        // 重新搜索
-        this.searchLastIndex = -1;
-      }
       if (!this.search) {
         this.$message.error("请输入关键词进行搜索");
         return;
@@ -1655,13 +1673,22 @@ export default {
         this.searchConfig.searchType === "single" &&
         !this.searchConfig.bookSourceUrl
       ) {
+        this.$message.error("请选择书源进行搜索");
         return;
       }
-      if (this.loadingMore) {
-        return;
+      if (page) {
+        this.searchPage = page;
+      }
+      page = this.searchPage;
+      if (page === 1) {
+        // 重新搜索
+        this.searchLastIndex = -1;
       }
       if (this.searchConfig.searchType === "multi" && window.EventSource) {
         this.searchBookByEventStream(page);
+        return;
+      }
+      if (this.loadingMore) {
         return;
       }
       this.isSearchResult = true;
@@ -1717,6 +1744,28 @@ export default {
       );
     },
     searchBookByEventStream(page) {
+      const tryClose = () => {
+        try {
+          if (
+            this.searchEventSource &&
+            this.searchEventSource.readyState != this.searchEventSource.CLOSED
+          ) {
+            this.searchEventSource.close();
+          }
+          this.searchEventSource = null;
+        } catch (error) {
+          //
+        }
+      };
+      if (this.loadingMore) {
+        tryClose();
+        this.loadingMore = false;
+        // page === 1 是重新搜索
+        if (page !== 1) {
+          // 停止搜索
+          return;
+        }
+      }
       const params = {
         accessToken: this.$store.state.token,
         key: this.search,
@@ -1734,12 +1783,15 @@ export default {
         this.searchResult = [];
       }
       const url = buildURL(this.api + "/searchBookMultiSSE", params);
+
+      tryClose();
+
       this.searchEventSource = new EventSource(url, {
         withCredentials: true
       });
       this.searchEventSource.addEventListener("error", e => {
         this.loadingMore = false;
-        this.searchEventSource.close();
+        tryClose();
         try {
           if (e.data) {
             const result = JSON.parse(e.data);
@@ -1754,7 +1806,7 @@ export default {
       let oldSearchResultLength = this.searchResult.length;
       this.searchEventSource.addEventListener("end", e => {
         this.loadingMore = false;
-        this.searchEventSource.close();
+        tryClose();
         try {
           if (e.data) {
             const result = JSON.parse(e.data);
@@ -2102,9 +2154,26 @@ export default {
       );
     },
     handleCheckAllChange(val) {
+      let hasFilterd = false;
       this.checkedSourceIndex = val
-        ? this.importSourceList.map((v, i) => i)
+        ? this.importSourceList
+            .map((v, i) => {
+              // 不勾选使用了 js，webview的书源
+              const source = JSON.stringify(v);
+              if (
+                source.indexOf("@js:") !== -1 ||
+                source.indexOf("webView:") !== -1
+              ) {
+                hasFilterd = true;
+                return false;
+              }
+              return i;
+            })
+            .filter(v => v)
         : [];
+      if (val && hasFilterd) {
+        this.$message.info("部分使用了Javascript和Webview的书源未勾选");
+      }
       this.isIndeterminate = false;
     },
     handleCheckedSourcesChange(value) {
@@ -2112,6 +2181,19 @@ export default {
       this.checkAll = checkedCount === this.importSourceList.length;
       this.isIndeterminate =
         checkedCount > 0 && checkedCount < this.importSourceList.length;
+    },
+    getSourceTag(source) {
+      const sourceStr = JSON.stringify(source);
+      const tags = [];
+      if (sourceStr.indexOf("@js:") !== -1) {
+        tags.push("@Javascript");
+      }
+
+      if (sourceStr.indexOf("webView:") !== -1) {
+        tags.push("@WebView");
+      }
+
+      return "   " + tags.join("  ");
     },
     saveSourceList() {
       if (!this.$store.state.connected) {
@@ -2143,6 +2225,7 @@ export default {
             }
             this.showImportSourceDialog = false;
             this.isImportRssSource = false;
+            this.checkedSourceIndex = [];
           }
         },
         error => {
@@ -3288,61 +3371,62 @@ export default {
           });
       }
     },
-    scanLocalStorage() {
+    async scanCacheStorage() {
       this.localCacheStats = {
-        total: this.analyseLocalStorage().totalBytes,
-        bookSourceList: this.analyseLocalStorage("bookSourceList").totalBytes,
-        rssSources: this.analyseLocalStorage("rssSources").totalBytes,
-        chapterList: this.analyseLocalStorage("chapterList").totalBytes,
-        chapterContent: this.analyseLocalStorage("chapterContent").totalBytes
+        total: (await this.analyseLocalStorage()).totalBytes,
+        bookSourceList: (await this.analyseLocalStorage("bookSourceList"))
+          .totalBytes,
+        rssSources: (await this.analyseLocalStorage("rssSources")).totalBytes,
+        chapterList: (await this.analyseLocalStorage("chapterList")).totalBytes,
+        chapterContent: (await this.analyseLocalStorage("chapterContent"))
+          .totalBytes
       };
     },
     analyseLocalStorage(match) {
       let totalBytes = 0;
       let cacheBytes = 0;
-      try {
-        for (const key in window.localStorage) {
+      return window.$cacheStorage
+        .iterate(function(value, key) {
           if (!match || key.indexOf(match) >= 0) {
-            if (Object.hasOwnProperty.call(window.localStorage, key)) {
-              const data = window.localStorage[key];
-              totalBytes += data.getBytesLength();
-              if (key.startsWith("localCache@")) {
-                cacheBytes += data.getBytesLength();
-              }
+            totalBytes += JSON.stringify(value).getBytesLength();
+            if (key.startsWith("localCache@")) {
+              cacheBytes += JSON.stringify(value).getBytesLength();
             }
           }
-        }
-      } catch (e) {
-        //
-      }
-      return {
-        totalBytes: formatSize(totalBytes),
-        cacheBytes: formatSize(cacheBytes)
-      };
+        })
+        .then(() => {
+          return {
+            totalBytes: formatSize(totalBytes),
+            cacheBytes: formatSize(cacheBytes)
+          };
+        })
+        .catch(function() {
+          // 当出错时，此处代码运行
+          // console.log(err);
+        });
     },
     clearCache(match) {
       let cacheBytes = 0;
-      try {
-        for (const key in window.localStorage) {
+      window.$cacheStorage
+        .iterate(function(value, key) {
           if (!match || key.indexOf(match) >= 0) {
-            if (Object.hasOwnProperty.call(window.localStorage, key)) {
-              const data = window.localStorage[key];
-              if (key.startsWith("localCache@")) {
-                cacheBytes += data.getBytesLength();
-                window.localStorage.removeItem(key);
-              }
+            if (key.startsWith("localCache@")) {
+              cacheBytes += JSON.stringify(value).getBytesLength();
+              window.$cacheStorage.removeItem(key);
             }
           }
-        }
-      } catch (e) {
-        //
-      }
+        })
+        .then(() => {
+          this.scanCacheStorage();
 
-      this.scanLocalStorage();
-
-      return {
-        cacheBytes: formatSize(cacheBytes)
-      };
+          return {
+            cacheBytes: formatSize(cacheBytes)
+          };
+        })
+        .catch(function() {
+          // 当出错时，此处代码运行
+          // console.log(err);
+        });
     },
     scrollHandler() {
       this.lastScrollTop = this.$refs.bookList.scrollTop;
@@ -3350,7 +3434,7 @@ export default {
   },
   computed: {
     config() {
-      return this.$store.state.config;
+      return this.$store.getters.config;
     },
     isNight() {
       return this.$store.getters.isNight;
